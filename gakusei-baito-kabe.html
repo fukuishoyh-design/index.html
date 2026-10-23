@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>学生バイト 年収の壁チェッカー（2026年分）</title>
+<meta name="description" content="学生のバイト年収を入れると、所得税・住民税、社会保険、親の扶養に残れるかを2026年分のルールで簡易チェックできます。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="学生バイト 年収の壁チェッカー（2026年分）">
+<meta property="og:description" content="年収の見込みを入れるだけで、税金・社会保険・親の扶養の状況がわかります。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f6;--card:#fff;--ink:#14213d;--sub:#5a6577;--line:#d5dce6;--accent:#0b6e8a;--ok:#1b7f4b;--okbg:#e2f3ea;--warn:#a05a00;--warnbg:#fdf0d9;--ng:#b3261e;--ngbg:#fbe4e2;--track:#dfe6ee;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1722;--card:#18232f;--ink:#e8eef6;--sub:#9aa8ba;--line:#2b3949;--accent:#5cc3e0;--ok:#6fd49b;--okbg:#17352a;--warn:#f0b35a;--warnbg:#38290f;--ng:#ff8a80;--ngbg:#3d1b19;--track:#2b3949}}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;line-height:1.7}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.5rem;font-weight:900;margin:8px 0 4px;line-height:1.35}
+.lead{color:var(--sub);margin:0 0 18px;font-size:.92rem}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.row{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px}
+.row>label{flex:1 1 200px;font-size:.85rem;color:var(--sub);font-weight:500}
+select,input[type=number]{width:100%;margin-top:4px;padding:10px;font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px}
+.big{display:flex;align-items:baseline;gap:8px}
+.big input{font-size:2rem;font-weight:900;width:150px;text-align:right}
+.big span{font-weight:700}
+.mo{font-size:.85rem;color:var(--sub);margin-left:auto}
+input[type=range]{width:100%;margin:12px 0 0;accent-color:var(--accent)}
+.chk{display:flex;gap:8px;align-items:center;font-size:.9rem;color:var(--ink);margin-top:14px}
+.chk input{width:18px;height:18px;accent-color:var(--accent)}
+h2{font-size:1.1rem;margin:28px 0 10px}
+.cards{display:grid;gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.card h3{margin:0 0 6px;font-size:1rem}
+.badge{display:inline-block;font-weight:700;font-size:.85rem;padding:2px 10px;border-radius:99px;margin-bottom:6px}
+.ok{background:var(--okbg);color:var(--ok)}.warn{background:var(--warnbg);color:var(--warn)}.ng{background:var(--ngbg);color:var(--ng)}
+.card p{margin:4px 0;font-size:.92rem}
+.small{font-size:.8rem;color:var(--sub)}
+.walls{list-style:none;margin:0;padding:0}
+.walls li{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line);font-size:.9rem}
+.walls li:first-child{border-top:0}
+.walls b{font-weight:900;font-size:1.05rem}
+.bar{position:relative;height:10px;border-radius:5px;background:var(--track);margin:6px 0 4px;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--accent)}
+.todo{margin:0;padding-left:1.2em;font-size:.92rem}
+.todo li{margin:6px 0}
+.note{font-size:.78rem;color:var(--sub);margin-top:24px}
+</style>
+</head>
+<body>
+<main>
+<h1>学生バイトの年収の壁チェッカー</h1>
+<p class="lead">2026年1〜12月の見込み年収を入れると、税金・社会保険・親の扶養がどうなるかをざっくり確認できます（令和8年度税制改正を反映）。</p>
+
+<section class="panel">
+  <div class="small">① 給与の年収見込み（交通費を除く・手取りではなく支給額）。税金と扶養控除の判定に使います</div>
+  <div class="big"><input id="num" type="number" min="0" max="250" step="1" value="120" inputmode="decimal" aria-label="給与の年収（万円）"><span>万円</span><span class="mo" id="mo"></span></div>
+  <input id="rng" type="range" min="0" max="250" step="1" value="120" aria-label="給与の年収スライダー">
+  <div class="small" style="margin-top:14px">② 非課税の通勤手当（交通費）の年間合計。月15万円までは所得税がかかりませんが、社会保険の判定には含まれます</div>
+  <div class="big"><input id="trn" type="number" min="0" max="50" step="0.1" value="0" inputmode="decimal" aria-label="通勤手当の年額（万円）"><span>万円</span><span class="mo" id="mo2"></span></div>
+  <div class="small" id="sumline" style="margin-top:8px;font-weight:700"></div>
+  <div class="row">
+    <label>年齢（2026年12月31日時点）
+      <select id="age"><option value="u18">18歳以下</option><option value="m" selected>19〜22歳</option><option value="o23">23歳以上</option></select></label>
+    <label>週の所定労働時間
+      <select id="hours"><option value="s">20時間未満</option><option value="m" selected>20〜30時間未満</option><option value="l">30時間以上</option></select></label>
+  </div>
+  <label class="chk"><input id="day" type="checkbox" checked>昼間の大学・短大・専門学校などの学生（夜間・通信制・休学中は外す）</label>
+</section>
+
+<h2>あなたの結果</h2>
+<div class="cards" id="cards"></div>
+
+<h2>年収の壁と現在地</h2>
+<section class="panel">
+  <div class="bar"><i id="fill"></i></div>
+  <ul class="walls" id="walls"></ul>
+</section>
+
+<h2>年末調整・申告でやること</h2>
+<section class="panel"><ol class="todo" id="todo"></ol></section>
+
+<p class="note">※2026年分（年末調整は今年）のルールに基づく概算です。社会保険料控除・各種控除・調整控除などは考慮していません。住民税は2026年の収入に対する令和9年度分で、東京23区など一級地を前提にした目安です。自治体、勤務先の社保適用状況、親の勤務先の家族手当の基準などで結果が変わります。最終判断は勤務先・税務署・市区町村・親の勤務先の担当者に確認してください。</p>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const yen=n=>Math.round(n).toLocaleString('ja-JP');
+const ded=x=>x<=220?74:(x<=360?x*0.3+8:x*0.2+44);
+function wallList(age){
+  const a=[{v:119,t:'住民税がかかり始める（目安）'},{v:136,t:'親の「扶養控除」の対象から外れる（税）'}];
+  if(age==='m'){a.push({v:150,t:'親の健康保険の扶養から外れる（19〜22歳は150万円未満）'},{v:159,t:'親の「特定親族特別控除」が満額でなくなる'});}
+  else a.push({v:130,t:'親の健康保険の扶養から外れる（130万円未満）'});
+  a.push({v:178,t:'自分の所得税がかかり始める'});
+  if(age==='m')a.push({v:197,t:'親の「特定親族特別控除」がゼロになる'});
+  return a.sort((p,q)=>p.v-q.v);
+}
+function render(){
+  const x=Math.max(0,parseFloat($('num').value)||0), tr=Math.max(0,parseFloat($('trn').value)||0), xs=Math.round((x+tr)*10)/10, age=$('age').value, hrs=$('hours').value, day=$('day').checked;
+  $('rng').value=Math.min(x,250);$('mo').textContent='月平均 約'+yen(x*10000/12)+'円';$('mo2').textContent='月平均 約'+yen(tr*10000/12)+'円';$('sumline').textContent='税金の判定：'+x+'万円　／　社会保険（健保の扶養）の判定：'+xs+'万円（交通費込み）';
+  $('fill').style.width=Math.min(100,x/250*100)+'%';
+  const inc=Math.max(0,x-ded(x));
+  const itax=Math.max(0,inc-104)*0.05*1.021*10000;
+  const rtax=inc<=45?0:(5000+Math.max(0,inc-43-(day&&inc<=85?26:0))*0.1*10000);
+  let c='';
+  // 1 tax
+  let b1=x<=119?['ok','所得税も住民税もかからない見込み']:x<=178?['warn','所得税はゼロ、住民税はかかる見込み']:['ng','所得税・住民税の両方がかかる'];
+  c+=`<div class="card"><h3>① 自分は納税の対象？</h3><span class="badge ${b1[0]}">${b1[1]}</span>
+  <p>所得税：${itax>0?'約'+yen(itax)+'円':'0円（年収178万円以下）'}</p>
+  <p>住民税：${rtax>0?'約'+yen(rtax)+'円（来年度に請求）':'かからない見込み（年収約119万円以下）'}</p>
+  ${x>0&&x<=178?'<p class="small">バイト先で所得税が天引きされていても、年末調整か確定申告で全額戻ります。</p>':''}</div>`;
+  // 2 social insurance
+  let b2,t2;
+  if(hrs==='l'){b2=['warn','勤務先で社会保険に加入する可能性あり'];t2='週30時間以上（正社員の約4分の3以上）の場合、学生でも健康保険・厚生年金の加入対象になることがあります。勤務先に確認を。';}
+  else if(hrs==='m'&&!day){b2=['warn','勤務先の規模次第で加入対象'];t2='週20時間以上で、従業員51人以上の勤務先（2027年10月から36人以上）なら加入対象です。2026年10月に「月8.8万円以上」の賃金要件はなくなる見込みです。';}
+  else if(hrs==='m'){b2=['ok','学生なので加入対象外（週30時間未満）'];t2='昼間学生は、週20〜30時間のバイトなら勤務先の社会保険には加入しません。卒業後や休学・夜間に変わると対象になります。';}
+  else{b2=['ok','加入対象外'];t2='週20時間未満のため、勤務先の社会保険・雇用保険の対象外です。';}
+  const lim=age==='m'?150:130;
+  const out=xs>=lim;
+  c+=`<div class="card"><h3>② 社会保険の加入対象？</h3><span class="badge ${b2[0]}">${b2[1]}</span><p>${t2}</p>
+  <p>${out?`交通費込みの年収（約${xs}万円）が${lim}万円以上のため、親の健康保険の扶養には入れません。自分で国民健康保険（または勤務先の健保）に加入します。`:`交通費込みの年収（約${xs}万円）が${lim}万円未満なので、親の健康保険の扶養に残れます。`}</p>
+  <p class="small">20歳になると国民年金の納付義務が生じます。収入が少ない学生は「学生納付特例」で納付を猶予できます。</p></div>`;
+  // 3 dependent
+  let b3,t3;
+  if(x<=136){b3=['ok','親の扶養控除の対象（税）'];t3=age==='m'?'親は特定扶養控除（63万円）を受けられます。':age==='u18'?'親は扶養控除を受けられます（16〜18歳は38万円。15歳以下は対象外）。':'親は扶養控除（38万円）を受けられます。';}
+  else if(age==='m'&&x<=159){b3=['ok','扶養控除は外れるが、親の税は変わらない'];t3='19〜22歳は「特定親族特別控除」で、年収159万円以下なら親は満額（63万円）の控除を受けられます。';}
+  else if(age==='m'&&x<=197){b3=['warn','親の控除が段階的に減る'];t3='特定親族特別控除が63万円から3万円へ少しずつ減ります。親の税負担は少し増えます。';}
+  else{b3=['ng','親の控除は受けられない'];t3='親の税負担が増えます。例：親の所得税率10%・住民税10%なら、扶養控除（63万円／住民税45万円）の分で年約10万円の増税です。';}
+  c+=`<div class="card"><h3>③ 親の扶養に残れる？</h3><span class="badge ${b3[0]}">${b3[1]}</span><p>${t3}</p>
+  <p class="small">税の扶養は1〜12月の給与（非課税の通勤手当は除く）で、健康保険の扶養は今後1年の見込み（通勤手当を含み、残業代は除く契約上の収入）で判定します。別ルールです。親の勤務先の家族手当にも独自の基準があります。</p></div>`;
+  $('cards').innerHTML=c;
+  $('walls').innerHTML=wallList(age).map(w=>{const h=w.t.indexOf('健康保険')>=0;const over=(h?xs:x)>w.v;return `<li><b>${w.v}万</b><span>${w.t}<br><span class="small">${h?'交通費込みで判定':'交通費を除く給与で判定'}</span></span><span class="badge ${over?'ng':'ok'}" style="margin:0">${over?'超えている':'範囲内'}</span></li>`}).join('');
+  // todo
+  let t='<li>バイト先に「給与所得者の扶養控除等申告書（甲欄）」を出していれば、年末調整で精算されます。出していない・バイトを掛け持ちしている場合は、来年2〜3月に確定申告をします。</li>';
+  if(x<=178&&x>0)t+='<li>源泉徴収された所得税は還付される可能性が高いので、源泉徴収票は必ず保管しましょう。</li>';
+  if(x>119)t+='<li>住民税は来年6月ごろから請求されます。バイト先の天引き（特別徴収）か、自分で納付（普通徴収）になります。</li>';
+  t+=x>(age==='m'?159:136)?'<li>親の控除に影響が出ています。親に年間の見込み年収を早めに伝え、親の年末調整の申告に反映してもらいましょう。</li>':'<li>親の年末調整（11〜12月ごろ）で、あなたの年間の見込み年収を親に伝えておきましょう。</li>';
+  if(xs>=lim-10&&xs<lim+20)t+=`<li>健康保険の扶養の${lim}万円は目安ぎりぎりです。シフトを増やす前に、親の健保組合に認定基準を確認してください。</li>`;
+  if(age==='m'&&day)t+='<li>年収が150万円以下で所得が一定以下なら、本人は「勤労学生控除」も使えますが、所得税がゼロの範囲では実質不要です。</li>';
+  $('todo').innerHTML=t;
+}
+$('num').addEventListener('input',render);$('trn').addEventListener('input',render);
+$('rng').addEventListener('input',e=>{$('num').value=e.target.value;render()});
+['age','hours','day'].forEach(i=>$(i).addEventListener('change',render));
+render();
+</script>
+</body>
+</html>
